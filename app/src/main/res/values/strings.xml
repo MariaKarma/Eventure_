@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">Eventure</string>
+    <string name="sign_in_to_your_account">Sign in to your account</string>
+    <string name="profile">Profile</string>
+    <string name="map">Map</string>
+    <string name="hint">Hint</string>
+    <string name="enter_as_guest">Wanna enter as guest? </string>
+    <string name="skip">Skip</string>
+    <string name="logout">Log Out</string>
+    <string name="user">User</string>
+    <string name="add_email">Add Email</string>
+    <string name="select_region_code">Select Region Code</string>
+    <string name="search">Search</string>
+    <string name="no_matches_found">No Matches Found</string>
+    <string name="li">LI</string>
+    <string name="example">Example</string>
+    <string name="or">Or</string>
+    <string name="save">Save</string>
+    <string name="verification">VERIFICATION</string>
+    <string name="timer">timer</string>
+    <string name="otp_verification">OTP VERIFICATION</string>
+    <string name="enter_your_verification_code">Enter your verification code</string>
+    <string name="submit">Submit</string>
+    <string name="didn_t_receive_the_code">Didn\'t receive the code?</string>
+    <string name="resend">RESEND</string>
+    <string name="default_web_client_id" translatable="false">729418592990-4osiaurrh54bbmfnohqi1bp82f57hr7o.apps.googleusercontent.com</string>
+
+</resources>

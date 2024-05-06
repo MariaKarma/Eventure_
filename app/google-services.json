@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "729418592990",
+    "project_id": "eventuree-dd89b",
+    "storage_bucket": "eventuree-dd89b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:729418592990:android:e435f94cda09997dba484f",
+        "android_client_info": {
+          "package_name": "com.example.ev"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "729418592990-7qt6gv8vip030dk2soccu88s70tal7ko.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.ev",
+            "certificate_hash": "8812585cb444341f878281c0a2efcdb6f72ea5ae"
+          }
+        },
+        {
+          "client_id": "729418592990-4osiaurrh54bbmfnohqi1bp82f57hr7o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDcMXjQ36PiELMpPSuRMwvTBVikzk3dq78"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "729418592990-4osiaurrh54bbmfnohqi1bp82f57hr7o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

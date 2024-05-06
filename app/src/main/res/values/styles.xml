@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="MyCustomTextInputLayoutStyle_Filled" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
+        <item name="startIconTint">@null</item>
+    </style>
+
+    <style name="BottomSheetDialogTheme" parent="BaseBottomSheetDialog" />
+
+    <style name="BaseBottomSheetDialog" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="android:windowIsFloating">false</item>
+        <item name="bottomSheetStyle">@style/BottomSheet</item>
+        <item name="android:windowSoftInputMode">adjustResize</item>
+    </style>
+
+    <style name="BottomSheet" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@drawable/rounded_bottom_sheet</item>
+    </style>
+
+    <style name="MyButtonComponent_Filled_Purple" parent="Widget.AppCompat.Button.Colored">
+        <item name="android:background">@drawable/rounded_square_button_filled</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="MyButtonComponent_Bordered_Purple" parent="Widget.AppCompat.Button.Colored">
+        <item name="android:background">@drawable/rounded_square_button</item>
+        <item name="android:textColor">@color/button_purple_color</item>
+    </style>
+
+
+
+    <style name="ABottomCardSheet" parent="BaseABottomCardSheet" />
+
+    <style name="BaseABottomCardSheet" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="android:windowIsFloating">false</item>
+        <item name="bottomSheetStyle">@style/ABottomSheet</item>
+        <item name="android:windowSoftInputMode">adjustResize</item>
+    </style>
+
+    <style name="ABottomSheet" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@drawable/rounded_top_background</item>
+    </style>
+
+
+    <style name="BBottomCardSheet" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="android:windowIsFloating">false</item>
+        <item name="bottomSheetStyle">@style/ABottomSheet</item>
+        <item name="android:dividerHeight">0dp</item>
+    </style>
+
+</resources>
