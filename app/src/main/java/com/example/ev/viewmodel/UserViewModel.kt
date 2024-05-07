@@ -10,20 +10,11 @@ import kotlinx.coroutines.launch
 
 class UserViewModel(private val repository: UserRepository) : ViewModel() {
 
-    private var testUser : LiveData<User>? = null
+    private val testUser : LiveData<User>
+    get() = repository.getUserByUid(uid).asLiveData(viewModelScope.coroutineContext)
 
     fun getUser() = repository.getUser().asLiveData(viewModelScope.coroutineContext)
-
-    fun getUserByUidTest(uid: String)  : LiveData<User>? {
-        if (testUser == null){
-            testUser = repository.getUserByUid(uid).asLiveData(viewModelScope.coroutineContext)
-        }
-        return testUser
-    }
-
     fun getUserByUid(uid: String)  = repository.getUserByUid(uid).asLiveData(viewModelScope.coroutineContext)
-
-
 
     fun deleteUser(){
         viewModelScope.launch {
