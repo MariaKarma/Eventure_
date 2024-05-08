@@ -24,5 +24,13 @@
     <string name="didn_t_receive_the_code">Didn\'t receive the code?</string>
     <string name="resend">RESEND</string>
     <string name="default_web_client_id" translatable="false">729418592990-4osiaurrh54bbmfnohqi1bp82f57hr7o.apps.googleusercontent.com</string>
+    <string name="category">Category: </string>
+    <string name="type">Type: </string>
+    <string name="date">Date: </string>
+    <string name="start_time">Start Time: </string>
+    <string name="end_time">End Time: </string>
+    <string name="entrance_fee">Entrance Fee: </string>
+    <string name="description">Description: </string>
+
 
 </resources>

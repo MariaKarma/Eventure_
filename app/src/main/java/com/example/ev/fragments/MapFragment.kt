@@ -14,6 +14,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.ev.R
+import com.example.ev.bottom_sheet_dialog.EventDetailBottomSheet
 import com.example.ev.data.Events
 import com.example.ev.databinding.FragmentMapBinding
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -90,20 +91,28 @@ class MapFragment : Fragment() {
         val events = generateSampleEvents()
         events.forEach { event ->
             val latLng = LatLng(event.latitude.toDouble(), event.longitude.toDouble())
-            mMap.addMarker(
-                MarkerOptions()
+            val marker = mMap.addMarker(MarkerOptions()
                 .position(latLng)
-                .title(event.category)
-                .snippet(event.toString()))
+                .title(event.name))
+            marker?.tag = event
         }
     }
 
     private fun updateMap() {
         if (mapReady) {
-            mMap.setOnInfoWindowClickListener { marker ->
-                Toast.makeText(context, marker.snippet, Toast.LENGTH_LONG).show()
+            mMap.setOnMarkerClickListener { marker ->
+                val event = marker.tag as? Events
+                event?.let {
+                    openEventDetailsFragment(it)
+                }
+                true
             }
         }
+    }
+
+    private fun openEventDetailsFragment(event: Events) {
+        val bottomSheet = EventDetailBottomSheet.newInstance(event)
+        bottomSheet.show(parentFragmentManager, "EventDetailBottomSheet")
     }
 
     private fun generateSampleEvents(): List<Events> {

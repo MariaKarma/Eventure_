@@ -8,10 +8,27 @@
     <fragment
         android:id="@+id/navigation_map"
         android:name="com.example.ev.fragments.MapFragment"
-        android:label="MapFragment" />
+        android:label="MapFragment">
+    <action
+        android:id="@+id/action_navigation_map_to_eventDetailFragment"
+        app:destination="@id/eventDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/eventDetailFragment"
+        android:name="com.example.ev.bottom_sheet_dialog.EventDetailBottomSheet"
+        android:label="Event Details"
+        tools:layout="@layout/bottom_sheet_event_detail">
+        <argument
+            android:name="event"
+            app:argType="com.example.ev.data.Events"
+            app:nullable="false" />
+    </fragment>
+
     <fragment
         android:id="@+id/navigation_profile"
         android:name="com.example.ev.fragments.ProfileFragment"
         android:label="fragment_profile"
         tools:layout="@layout/fragment_profile" />
+
 </navigation>
