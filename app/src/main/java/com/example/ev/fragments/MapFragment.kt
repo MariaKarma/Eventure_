@@ -37,7 +37,8 @@ class MapFragment : Fragment() {
     private lateinit var mMap: GoogleMap
     private var mapReady = false
     private lateinit var events: List<Events>
-    private var currentCategory: String? = null
+    private var currentCategory: String? = "All"
+    private var currentDateRange: DateRange = DateRange.TODAY
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = FragmentMapBinding.inflate(inflater, container, false)
@@ -74,13 +75,6 @@ class MapFragment : Fragment() {
 
         mMap.isMyLocationEnabled = true
         mMap.uiSettings.isMyLocationButtonEnabled = true
-        val locationManager = activity?.getSystemService(Context.LOCATION_SERVICE) as? LocationManager
-        val provider = locationManager?.getBestProvider(Criteria(), true)
-        val location = provider?.let { locationManager.getLastKnownLocation(it) }
-        location?.let {
-            val userLatLng = LatLng(it.latitude, it.longitude)
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, 12f))
-        }
         setupMarkerClickListener()
     }
 
@@ -95,7 +89,6 @@ class MapFragment : Fragment() {
     }
 
     private fun addEventMarkers(events: List<Events>) {
-        mMap.clear()
         events.forEach { event ->
             val latLng = LatLng(event.latitude.toDouble(), event.longitude.toDouble())
             val marker = mMap.addMarker(MarkerOptions().position(latLng).title(event.name))
@@ -103,10 +96,7 @@ class MapFragment : Fragment() {
         }
     }
 
-    private fun displayEvents(events: List<Events>) {
-        mMap.clear()
-        addEventMarkers(events)
-    }
+
 
     private fun openEventDetailsFragment(event: Events) {
         val bottomSheet = EventDetailBottomSheet.newInstance(event)
@@ -140,59 +130,82 @@ class MapFragment : Fragment() {
 
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-                val range = DateRange.values()[position]
-                val filteredEvents = filterByDate(range)
-                displayEvents(filteredEvents)
+                currentDateRange = DateRange.values()[position]
+                updateFilteredEvents()
             }
-
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
-
-        displayEvents(filterByDate(DateRange.TODAY))
     }
 
     private fun setupCategoryFilterSpinner() {
         val spinner: Spinner = binding.categoryFilterSpinner
+
+        val adapter = ArrayAdapter.createFromResource(
+            requireContext(),
+            R.array.event_categories,
+            android.R.layout.simple_spinner_item
+        )
+
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinner.adapter = adapter
+
+        spinner.setSelection(if (currentCategory == "All") 0 else adapter.getPosition(currentCategory))
+
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-                val selectedCategory = parent.getItemAtPosition(position).toString()
-                currentCategory = selectedCategory
-                val filteredEvents = filterByCategory(selectedCategory)
-                displayEvents(filteredEvents)
+                currentCategory = parent.getItemAtPosition(position).toString()
+                updateFilteredEvents()
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
     }
 
+    private fun updateFilteredEvents() {
+        val dateFilteredEvents = filterByDate(currentDateRange)
+        val categoryFilteredEvents = filterByCategory(dateFilteredEvents)
+        displayEvents(categoryFilteredEvents)
+    }
+
     private fun filterByDate(range: DateRange): List<Events> {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val today = Calendar.getInstance()
-        today.set(Calendar.HOUR_OF_DAY, 0)
-        today.set(Calendar.MINUTE, 0)
-        today.set(Calendar.SECOND, 0)
-        today.set(Calendar.MILLISECOND, 0)
+        val today = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
 
-        val endOfPeriod = Calendar.getInstance()
-        when (range) {
-            DateRange.TODAY -> endOfPeriod.add(Calendar.DATE, 1)
-            DateRange.THIS_WEEK -> endOfPeriod.add(Calendar.DATE, 7)
-            DateRange.THIS_MONTH -> endOfPeriod.add(Calendar.MONTH, 1)
+        val endOfPeriod = Calendar.getInstance().apply {
+            when (range) {
+                DateRange.TODAY -> add(Calendar.DATE, 1)
+                DateRange.THIS_WEEK -> add(Calendar.DATE, 7)
+                DateRange.THIS_MONTH -> add(Calendar.MONTH, 1)
+            }
         }
 
 
         return events.filter {
-            val eventDate = Calendar.getInstance()
-            eventDate.time = dateFormat.parse(it.date) ?: return@filter false
-            eventDate.set(Calendar.HOUR_OF_DAY, 0)
-            eventDate.set(Calendar.MINUTE, 0)
-            eventDate.set(Calendar.SECOND, 0)
-            eventDate.set(Calendar.MILLISECOND, 0)
-
-            !eventDate.before(today) && eventDate.before(endOfPeriod)
+            val eventDate = dateFormat.parse(it.date)?.let { date ->
+                Calendar.getInstance().apply {
+                    time = date
+                    set(Calendar.HOUR_OF_DAY, 0)
+                    set(Calendar.MINUTE, 0)
+                    set(Calendar.SECOND, 0)
+                    set(Calendar.MILLISECOND, 0)
+                }
+            }
+            eventDate != null && !eventDate.before(today) && eventDate.before(endOfPeriod)
         }
     }
-    private fun filterByCategory(category: String): List<Events> {
-        return if (category == "All") events else events.filter { it.category == category }
+    private fun filterByCategory(events: List<Events>): List<Events> {
+        return if (currentCategory == "All") events else events.filter { it.category == currentCategory }
     }
+
+
+    private fun displayEvents(events: List<Events>) {
+        mMap.clear()
+        events.forEach { event ->
+            addEventMarkers(events)
+        }    }
 }
