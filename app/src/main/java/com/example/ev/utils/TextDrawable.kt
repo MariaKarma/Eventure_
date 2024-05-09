@@ -12,7 +12,7 @@ class TextDrawable(private val text: String) : Drawable() {
 
     init {
         paint.color = Color.WHITE
-        paint.textSize = 36f // Increase the text size to 36 pixels (adjust as needed)
+        paint.textSize = 36f
         paint.isAntiAlias = true
         paint.isFakeBoldText = true
         paint.setShadowLayer(6f, 0f, 0f, Color.BLACK)
@@ -21,19 +21,13 @@ class TextDrawable(private val text: String) : Drawable() {
     }
 
     override fun draw(canvas: Canvas) {
-        // Get the bounds of the drawable
         val bounds = bounds
 
-        // Set the background color (You can change the color or use a drawable resource here)
-        paint.color = Color.GRAY // For example, setting the background color to blue
-
-        // Draw the background rectangle
+        paint.color = Color.GRAY
         canvas.drawRect(bounds, paint)
 
-        // Set the color back to white for the text
         paint.color = Color.WHITE
 
-        // Draw the text at the center of the drawable
         val textWidth = paint.measureText(text)
         val x = (bounds.width() - textWidth) / 2f
         val y = bounds.height() / 2f - (paint.descent() + paint.ascent()) / 2f

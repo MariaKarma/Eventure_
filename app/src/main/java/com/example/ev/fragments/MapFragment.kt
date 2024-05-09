@@ -9,12 +9,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.Spinner
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.ev.R
 import com.example.ev.bottom_sheet_dialog.EventDetailBottomSheet
+import com.example.ev.data.DateRange
 import com.example.ev.data.Events
 import com.example.ev.databinding.FragmentMapBinding
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -22,92 +24,88 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-
+import java.text.SimpleDateFormat
+import java.util.*
 
 class MapFragment : Fragment() {
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
     }
+
     private var _binding: FragmentMapBinding? = null
     private val binding get() = _binding!!
     private lateinit var mMap: GoogleMap
     private var mapReady = false
+    private lateinit var events: List<Events>
+    private var currentCategory: String? = null
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = FragmentMapBinding.inflate(inflater, container, false)
+        events = generateSampleEvents()
         return binding.root
     }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val mapFragment = childFragmentManager.findFragmentById(R.id.map_Fragment) as SupportMapFragment
-        mapFragment.getMapAsync { googleMap ->
+        initializeMap()
+    }
+
+    private fun initializeMap() {
+        val mapFragment = childFragmentManager.findFragmentById(R.id.map_Fragment) as SupportMapFragment?
+        mapFragment?.getMapAsync { googleMap ->
             mMap = googleMap
             mapReady = true
-            requestLocationPermission()
+            setupMap()
+            setupFilterSpinners()
+            displayEvents(filterByDate(DateRange.TODAY))
         }
     }
 
-    private fun requestLocationPermission() {
-        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
-        } else {
-            setupMap()
-        }
-    }
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            setupMap()
-        } else {
-            Toast.makeText(context, "Permission denied", Toast.LENGTH_LONG).show()
-        }
-    }
     private fun setupMap() {
-        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            mMap.isMyLocationEnabled = true
-            mMap.uiSettings.isMyLocationButtonEnabled = true
+        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
+            return
+        }
 
-            val locationManager = activity?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-            val provider = locationManager.getBestProvider(Criteria(), true)
-            val location = locationManager.getLastKnownLocation(provider!!)
-            if (location != null) {
-                val userLatLng = LatLng(location.latitude, location.longitude)
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, 12f))
+        mMap.isMyLocationEnabled = true
+        mMap.uiSettings.isMyLocationButtonEnabled = true
+        val locationManager = activity?.getSystemService(Context.LOCATION_SERVICE) as? LocationManager
+        val provider = locationManager?.getBestProvider(Criteria(), true)
+        val location = provider?.let { locationManager.getLastKnownLocation(it) }
+        location?.let {
+            val userLatLng = LatLng(it.latitude, it.longitude)
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, 12f))
+        }
+        setupMarkerClickListener()
+    }
+
+    private fun setupMarkerClickListener() {
+        mMap.setOnMarkerClickListener { marker ->
+            val event = marker.tag as? Events
+            event?.let {
+                openEventDetailsFragment(it)
             }
-            addEventMarkers()
-            updateMap()
+            true
         }
     }
 
-    private fun addEventMarkers() {
-        val events = generateSampleEvents()
+    private fun addEventMarkers(events: List<Events>) {
+        mMap.clear()
         events.forEach { event ->
             val latLng = LatLng(event.latitude.toDouble(), event.longitude.toDouble())
-            val marker = mMap.addMarker(MarkerOptions()
-                .position(latLng)
-                .title(event.name))
+            val marker = mMap.addMarker(MarkerOptions().position(latLng).title(event.name))
             marker?.tag = event
         }
     }
 
-    private fun updateMap() {
-        if (mapReady) {
-            mMap.setOnMarkerClickListener { marker ->
-                val event = marker.tag as? Events
-                event?.let {
-                    openEventDetailsFragment(it)
-                }
-                true
-            }
-        }
+    private fun displayEvents(events: List<Events>) {
+        mMap.clear()
+        addEventMarkers(events)
     }
 
     private fun openEventDetailsFragment(event: Events) {
@@ -117,10 +115,84 @@ class MapFragment : Fragment() {
 
     private fun generateSampleEvents(): List<Events> {
         return listOf(
-            Events("33.8930", "35.5279","Poiema", "Art", "Painting", "2023-05-07", "16:00", "18:00", "$15", "Tote Bag Painting.\nContact +961 81 123 123 for more details"),
-            Events("33.9064", "35.5095","Promoteam", "Education", "Expo", "2023-05-16", "16:00", "22:00", "Free", "Lebanon international solar week - expo and conference."),
-            Events("33.8902", "35.5705","Vamos Todos", "Nature", "Hike", "2023-05-30", "07:30", "17:00", "$50", "Bazhel - Nahr Ibrahim hike.\nPayment fee includes transport, guides, insurance and lunch. 30$ without lunch. For reservation contact: +961 81 123 123.")
+            Events("33.8930", "35.5279", "Poiema", "Art", "Painting", "2024-05-09", "16:00", "18:00", "$15", "Tote Bag Painting. Contact +961 81 123 123 for more details"),
+            Events("33.9064", "35.5095", "Promoteam", "Education", "Expo", "2024-05-15", "16:00", "22:00", "Free", "Lebanon international solar week - expo and conference."),
+            Events("33.8902", "35.5705", "Vamos Todos", "Nature", "Hike", "2024-05-30", "07:30", "17:00", "$50", "Bazhel - Nahr Ibrahim hike. Payment fee includes transport, guides, insurance and lunch. $30 without lunch. For reservation contact: +961 81 123 123.")
         )
     }
 
+    private fun setupFilterSpinners() {
+        setupDateFilterSpinner()
+        setupCategoryFilterSpinner()
+    }
+
+    private fun setupDateFilterSpinner() {
+        val spinner: Spinner = binding.dateFilterSpinner
+        val adapter = ArrayAdapter.createFromResource(
+            requireContext(),
+            R.array.date_filter_options,
+            android.R.layout.simple_spinner_item
+        )
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinner.adapter = adapter
+
+        spinner.setSelection(0)
+
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+                val range = DateRange.values()[position]
+                val filteredEvents = filterByDate(range)
+                displayEvents(filteredEvents)
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {}
+        }
+
+        displayEvents(filterByDate(DateRange.TODAY))
+    }
+
+    private fun setupCategoryFilterSpinner() {
+        val spinner: Spinner = binding.categoryFilterSpinner
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+                val selectedCategory = parent.getItemAtPosition(position).toString()
+                currentCategory = selectedCategory
+                val filteredEvents = filterByCategory(selectedCategory)
+                displayEvents(filteredEvents)
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {}
+        }
+    }
+
+    private fun filterByDate(range: DateRange): List<Events> {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val today = Calendar.getInstance()
+        today.set(Calendar.HOUR_OF_DAY, 0)
+        today.set(Calendar.MINUTE, 0)
+        today.set(Calendar.SECOND, 0)
+        today.set(Calendar.MILLISECOND, 0)
+
+        val endOfPeriod = Calendar.getInstance()
+        when (range) {
+            DateRange.TODAY -> endOfPeriod.add(Calendar.DATE, 1)
+            DateRange.THIS_WEEK -> endOfPeriod.add(Calendar.DATE, 7)
+            DateRange.THIS_MONTH -> endOfPeriod.add(Calendar.MONTH, 1)
+        }
+
+
+        return events.filter {
+            val eventDate = Calendar.getInstance()
+            eventDate.time = dateFormat.parse(it.date) ?: return@filter false
+            eventDate.set(Calendar.HOUR_OF_DAY, 0)
+            eventDate.set(Calendar.MINUTE, 0)
+            eventDate.set(Calendar.SECOND, 0)
+            eventDate.set(Calendar.MILLISECOND, 0)
+
+            !eventDate.before(today) && eventDate.before(endOfPeriod)
+        }
+    }
+    private fun filterByCategory(category: String): List<Events> {
+        return if (category == "All") events else events.filter { it.category == category }
+    }
 }

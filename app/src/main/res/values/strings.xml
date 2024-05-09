@@ -32,5 +32,20 @@
     <string name="entrance_fee">Entrance Fee: </string>
     <string name="description">Description: </string>
 
+    <string-array name="date_filter_options">
+        <item>Today</item>
+        <item>This Week</item>
+        <item>This Month</item>
+    </string-array>
+    <string-array name="event_categories">
+        <item>All</item>
+        <item>Music</item>
+        <item>Art</item>
+        <item>Theatre</item>
+        <item>Education</item>
+        <item>Nature</item>
+        <item>Food</item>
+    </string-array>
+
 
 </resources>
