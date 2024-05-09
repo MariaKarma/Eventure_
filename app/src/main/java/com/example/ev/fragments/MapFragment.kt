@@ -75,6 +75,18 @@ class MapFragment : Fragment() {
 
         mMap.isMyLocationEnabled = true
         mMap.uiSettings.isMyLocationButtonEnabled = true
+
+        val locationManager = activity?.getSystemService(Context.LOCATION_SERVICE) as? LocationManager
+        val provider = locationManager?.getBestProvider(Criteria(), true)
+        val location = provider?.let { locationManager.getLastKnownLocation(it) }
+
+        if (location != null) {
+            val userLatLng = LatLng(location.latitude, location.longitude)
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, 13f))
+        } else {
+            val defaultLocation = LatLng(33.9035, 35.5891)
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLocation, 13f))
+        }
         setupMarkerClickListener()
     }
 
