@@ -13,7 +13,7 @@ class UserRepository(private val userDatabase: AppDatabase){
     }
 
     suspend fun updateUser(user: User){
-        userDatabase.Dao().update(user)
+        userDatabase.Dao().updateUser(user)
     }
 
     suspend fun deleteUser() = userDatabase.Dao().deleteAllUsers()

@@ -14,16 +14,21 @@ import android.widget.ArrayAdapter
 import android.widget.Spinner
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import androidx.room.Dao
 import com.example.ev.R
 import com.example.ev.bottom_sheet_dialog.EventDetailBottomSheet
 import com.example.ev.data.DateRange
 import com.example.ev.data.Events
+import com.example.ev.database.AppDatabase
+import com.example.ev.database.Event
 import com.example.ev.databinding.FragmentMapBinding
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -40,10 +45,18 @@ class MapFragment : Fragment() {
     private var currentCategory: String? = "All"
     private var currentDateRange: DateRange = DateRange.TODAY
 
+    private lateinit var database: AppDatabase
+    private lateinit var dao: com.example.ev.database.Dao
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = FragmentMapBinding.inflate(inflater, container, false)
         events = generateSampleEvents()
+        initializeDatabase()
         return binding.root
+    }
+    private fun initializeDatabase() {
+        database = AppDatabase.getDatabase(requireContext())
+        dao = database.Dao()
     }
 
     override fun onDestroyView() {
@@ -54,6 +67,19 @@ class MapFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initializeMap()
+        addSampleEventsToDatabase()
+    }
+
+    private fun addSampleEventsToDatabase() {
+
+        lifecycleScope.launch {
+            // Check if events already exist
+            val count = dao.getEventsCount() // Make sure you have a method in your DAO to count events
+            if (count == 0) {
+                val sampleEvents = generateSampleEvents()
+                dao.insertAllEvents(sampleEvents.map { it.toDatabaseModel() })
+            }
+        }
     }
 
     private fun initializeMap() {
@@ -116,10 +142,27 @@ class MapFragment : Fragment() {
     }
 
     private fun generateSampleEvents(): List<Events> {
+        // Your existing method to generate events
         return listOf(
-            Events("33.8930", "35.5279", "Poiema", "Art", "Painting", "2024-05-09", "16:00", "18:00", "$15", "Tote Bag Painting. Contact +961 81 123 123 for more details"),
+            Events("33.8930", "35.5279", "Poiema", "Art", "Painting", "2024-05-10", "16:00", "18:00", "$15", "Tote Bag Painting. Contact +961 81 123 123 for more details"),
             Events("33.9064", "35.5095", "Promoteam", "Education", "Expo", "2024-05-15", "16:00", "22:00", "Free", "Lebanon international solar week - expo and conference."),
             Events("33.8902", "35.5705", "Vamos Todos", "Nature", "Hike", "2024-05-30", "07:30", "17:00", "$50", "Bazhel - Nahr Ibrahim hike. Payment fee includes transport, guides, insurance and lunch. $30 without lunch. For reservation contact: +961 81 123 123.")
+        )
+    }
+
+    fun Events.toDatabaseModel(): Event {
+        return Event(
+            eventId = UUID.randomUUID().toString(),
+            latitude = latitude,
+            longitude = longitude,
+            name = name,
+            category = category,
+            type = type,
+            date = date,
+            startTime = startTime,
+            endTime = endTime,
+            entrancefee = entrancefee,
+            description = description
         )
     }
 

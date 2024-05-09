@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
-    entities = [User::class], version = 1, exportSchema = true
+    entities = [User::class, Event::class], version = 2, exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun Dao(): Dao
