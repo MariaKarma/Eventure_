@@ -32,6 +32,7 @@ class EventDetailBottomSheet: BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         arguments?.getSerializable("event")?.let{
             val event = it as Events
+            binding.eventName.text = event.name
             binding.categoryDesc.text = event.category
             binding.typeDesc.text = event.type
             binding.dateDesc.text = event.date
