@@ -73,7 +73,6 @@ class MapFragment : Fragment() {
     private fun addSampleEventsToDatabase() {
 
         lifecycleScope.launch {
-            dao.deleteAllEvents()
             val count = dao.getEventsCount()
             if (count == 0) {
                 val sampleEvents = generateSampleEvents()
