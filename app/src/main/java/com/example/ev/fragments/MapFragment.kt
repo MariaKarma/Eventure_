@@ -15,7 +15,6 @@ import android.widget.Spinner
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.room.Dao
 import com.example.ev.R
 import com.example.ev.bottom_sheet_dialog.EventDetailBottomSheet
 import com.example.ev.data.DateRange
@@ -28,7 +27,10 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -41,7 +43,6 @@ class MapFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var mMap: GoogleMap
     private var mapReady = false
-    private lateinit var events: List<Events>
     private var currentCategory: String? = "All"
     private var currentDateRange: DateRange = DateRange.TODAY
 
@@ -50,7 +51,6 @@ class MapFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = FragmentMapBinding.inflate(inflater, container, false)
-        events = generateSampleEvents()
         initializeDatabase()
         return binding.root
     }
@@ -73,8 +73,7 @@ class MapFragment : Fragment() {
     private fun addSampleEventsToDatabase() {
 
         lifecycleScope.launch {
-            // Check if events already exist
-            val count = dao.getEventsCount() // Make sure you have a method in your DAO to count events
+            val count = dao.getEventsCount()
             if (count == 0) {
                 val sampleEvents = generateSampleEvents()
                 dao.insertAllEvents(sampleEvents.map { it.toDatabaseModel() })
@@ -89,9 +88,10 @@ class MapFragment : Fragment() {
             mapReady = true
             setupMap()
             setupFilterSpinners()
-            displayEvents(filterByDate(DateRange.TODAY))
+            updateFilteredEvents()
         }
     }
+
 
     private fun setupMap() {
         if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -142,7 +142,6 @@ class MapFragment : Fragment() {
     }
 
     private fun generateSampleEvents(): List<Events> {
-        // Your existing method to generate events
         return listOf(
             Events("33.8930", "35.5279", "Poiema", "Art", "Painting", "2024-05-10", "16:00", "18:00", "$15", "Tote Bag Painting. Contact +961 81 123 123 for more details"),
             Events("33.9064", "35.5095", "Promoteam", "Education", "Expo", "2024-05-15", "16:00", "22:00", "Free", "Lebanon international solar week - expo and conference."),
@@ -217,12 +216,36 @@ class MapFragment : Fragment() {
     }
 
     private fun updateFilteredEvents() {
-        val dateFilteredEvents = filterByDate(currentDateRange)
-        val categoryFilteredEvents = filterByCategory(dateFilteredEvents)
-        displayEvents(categoryFilteredEvents)
+        lifecycleScope.launch {
+            val dbEvents = fetchEventsFromDatabase()
+            val dateFilteredEvents = filterByDate(dbEvents, currentDateRange)
+            val categoryFilteredEvents = filterByCategory(dateFilteredEvents)
+            displayEvents(categoryFilteredEvents)
+        }
     }
 
-    private fun filterByDate(range: DateRange): List<Events> {
+    private suspend fun fetchEventsFromDatabase(): List<Events> {
+        return withContext(Dispatchers.IO) { // Perform database access on IO dispatcher
+            dao.getAllEvents().map { it.toDomainModel() }
+        }
+    }
+
+    fun Event.toDomainModel(): Events {
+        return Events(
+            latitude = latitude,
+            longitude = longitude,
+            name = name,
+            category = category,
+            type = type,
+            date = date,
+            startTime = startTime,
+            endTime = endTime,
+            entrancefee = entrancefee,
+            description = description
+        )
+    }
+
+    private fun filterByDate(events: List<Events>,range: DateRange): List<Events> {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val today = Calendar.getInstance().apply {
             set(Calendar.HOUR_OF_DAY, 0)

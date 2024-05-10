@@ -39,7 +39,8 @@ interface Dao {
 
     @Query("SELECT * FROM Event LIMIT 1")
     fun getEventProfileRepo(): Flow<Event>
-
+    @Query("SELECT * FROM Event")
+    fun getAllEvents(): List<Event>
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertEvent(event: Event)
     @Query("SELECT COUNT(*) FROM Event")
