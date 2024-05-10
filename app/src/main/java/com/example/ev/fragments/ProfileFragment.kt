@@ -8,7 +8,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.example.ev.activities.LoginPage
+import com.example.ev.bottom_sheet_dialog.AddEventBottomSheet
 import com.example.ev.bottom_sheet_dialog.EditProfileBottomSheet
+import com.example.ev.data.Events
 import com.example.ev.data.Profile
 import com.example.ev.databinding.FragmentProfileBinding
 import com.example.ev.dialog_fragment.OnSignOutCallback
@@ -47,6 +49,19 @@ class ProfileFragment : Fragment() {
                 }
             }).show(
                 (context as FragmentActivity).supportFragmentManager, "EditProfile"
+            )
+        }
+
+        binding.addEvent.setOnClickListener {
+
+
+            AddEventBottomSheet(onCompletionListener = object :
+                AddEventBottomSheet.OnCompletionListener {
+                override fun onDone(event: Events) {
+//                    updateProfile(profile)
+                }
+            }).show(
+                (context as FragmentActivity).supportFragmentManager, "AddEventBottomSheet"
             )
         }
 

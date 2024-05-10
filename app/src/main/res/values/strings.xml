@@ -7,6 +7,8 @@
     <string name="enter_as_guest">Wanna enter as guest? </string>
     <string name="skip">Skip</string>
     <string name="logout">Log Out</string>
+    <string name="history">History</string>
+    <string name="descrption">Description:</string>
     <string name="iam">I am</string>
     <string name="user">User</string>
     <string name="add_email">Add Email</string>
@@ -17,6 +19,7 @@
     <string name="example">Example</string>
     <string name="or">Or</string>
     <string name="save">Save</string>
+    <string name="add">Add</string>
     <string name="verification">VERIFICATION</string>
     <string name="timer">timer</string>
     <string name="otp_verification">OTP VERIFICATION</string>

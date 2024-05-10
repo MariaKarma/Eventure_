@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.ViewModelProvider
 import com.example.ev.R
 import com.example.ev.data.Profile
 import com.example.ev.databinding.SampleEditProfileBinding
@@ -35,7 +34,7 @@ class EditProfileBottomSheet(
 
         binding = SampleEditProfileBinding.inflate(inflater, container, false)
         binding.save.bind("Save"){}
-        binding.cancel.bind("Cancel"){}
+        binding.cancel.bind("Cancel"){ dismiss() }
 
         return binding.root
     }

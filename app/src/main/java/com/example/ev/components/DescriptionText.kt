@@ -6,7 +6,10 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.text.Editable
+import android.text.InputFilter
 import android.text.InputType
+import android.text.TextWatcher
 import android.util.AttributeSet
 import android.util.Log
 import android.view.ContextThemeWrapper
@@ -176,6 +179,33 @@ class DescriptionText : RelativeLayout {
         }
     }
 
+    fun setOnChangeListener(listener: (String) -> Unit) {
+        binding.text1.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                // Nothing needed here
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                // Nothing needed here
+            }
+
+            override fun afterTextChanged(editable: Editable?) {
+                listener(editable.toString())
+            }
+        })
+    }
+
+    fun setMaxCharacters(maxCharacters: Int) {
+        val filters = binding.text1.filters.toMutableList()
+        val lengthFilter = InputFilter.LengthFilter(maxCharacters)
+        val index = filters.indexOfFirst { it is InputFilter.LengthFilter }
+        if (index != -1) {
+            filters[index] = lengthFilter
+        } else {
+            filters.add(lengthFilter)
+        }
+        binding.text1.filters = filters.toTypedArray()
+    }
     fun setText(text: String) {
         binding.text1.setText(text)
     }
