@@ -51,5 +51,14 @@
         <item>Food</item>
     </string-array>
 
+    <string-array name="add_event_categories">
+        <item>Music</item>
+        <item>Art</item>
+        <item>Theatre</item>
+        <item>Education</item>
+        <item>Nature</item>
+        <item>Food</item>
+    </string-array>
+
 
 </resources>

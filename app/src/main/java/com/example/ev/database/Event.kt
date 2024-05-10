@@ -3,11 +3,12 @@ package com.example.ev.database
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.util.UUID
 
 @Entity(tableName = "Event")
 data class Event(
     @PrimaryKey
-    val eventId: String,
+    val eventId: String = UUID.randomUUID().toString(),
     @ColumnInfo(name = "latitude") var latitude: String,
     @ColumnInfo(name = "longitude") var longitude: String,
     @ColumnInfo(name = "name") var name: String,
