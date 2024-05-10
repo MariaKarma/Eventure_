@@ -47,11 +47,14 @@ interface Dao {
     suspend fun getEventsCount(): Int
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertAllEvents(events: List<Event>)
+    @Query("SELECT * FROM Event WHERE eventId = :eventId")
+    suspend fun getEventById(eventId: String): Event
     @Query("SELECT * FROM Event WHERE category LIKE :category AND date BETWEEN :startDate AND :endDate")
     fun getEventsFilteredByCategoryAndDate(category: String, startDate: String, endDate: String): Flow<List<Event>>
     @Query("DELETE FROM EVENT")
     suspend fun deleteAllEvents()
-
+    @Query("DELETE FROM Event WHERE eventId = :eventId")
+    suspend fun deleteEventById(eventId: String)
     @Update
     suspend fun updateEvent(event: Event)
 

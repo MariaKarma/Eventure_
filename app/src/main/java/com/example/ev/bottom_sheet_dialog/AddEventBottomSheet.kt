@@ -146,7 +146,6 @@ class AddEventBottomSheet(
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, categories)
         binding.category.adapter = adapter
 
-        // Listener to detect user interactions
         binding.category.setOnTouchListener { _, _ ->
             userHasInteracted = true
             false
@@ -154,7 +153,7 @@ class AddEventBottomSheet(
 
         binding.category.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-                if (userHasInteracted) { // Only validate if the user has interacted with the spinner
+                if (userHasInteracted) {
                     validateFields()
                 }
             }
@@ -166,7 +165,6 @@ class AddEventBottomSheet(
             }
         }
 
-        // Initialize with disabled "Add" button as default until user interacts
         binding.add.isEnabled = false
     }
     override fun getTheme(): Int = R.style.ABottomCardSheet

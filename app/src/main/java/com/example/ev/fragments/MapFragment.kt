@@ -73,6 +73,7 @@ class MapFragment : Fragment() {
     private fun addSampleEventsToDatabase() {
 
         lifecycleScope.launch {
+            dao.deleteAllEvents()
             val count = dao.getEventsCount()
             if (count == 0) {
                 val sampleEvents = generateSampleEvents()
@@ -142,6 +143,7 @@ class MapFragment : Fragment() {
     }
 
     private fun generateSampleEvents(): List<Events> {
+
         return listOf(
             Events("33.8930", "35.5279", "Poiema", "Art", "Painting", "2024-05-10", "16:00", "18:00", "$15", "Tote Bag Painting. Contact +961 81 123 123 for more details"),
             Events("33.9064", "35.5095", "Promoteam", "Education", "Expo", "2024-05-15", "16:00", "22:00", "Free", "Lebanon international solar week - expo and conference."),

@@ -28,6 +28,18 @@
             app:layout_constraintStart_toStartOf="@id/header"
             app:layout_constraintTop_toTopOf="@id/header" />
 
+        <ImageView
+            android:id="@+id/delete"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:src="@drawable/trash_blank_alt_svgrepo_com"
+            android:layout_marginEnd="18dp"
+            android:layout_marginTop="20dp"
+            app:layout_constraintHeight_percent="0.5"
+            app:layout_constraintWidth_percent="0.11"
+            app:layout_constraintEnd_toEndOf="@id/header"
+            app:layout_constraintTop_toTopOf="@id/header"/>
+
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/event_name"
             android:layout_width="wrap_content"
