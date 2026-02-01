@@ -11,6 +11,7 @@ This project was developed as my graduation project, focusing on clean architect
 ⸻
 
 Features
+
     •   Interactive map using Google Maps API
     •   Custom map markers representing events
     •   Event detail view when selecting a marker
@@ -23,6 +24,7 @@ Features
 ⸻
 
 Tech Stack
+
 	•	Language: Kotlin
 	•	Architecture: MVVM (for user/authentication)
 	•	UI: Android Views / XML
@@ -37,6 +39,7 @@ Tech Stack
 Architecture
 
 The app separates responsibilities while keeping the architecture straightforward:
+
 	•	MapFragment / Activities: Handles UI rendering and event filtering logic
 	•	ViewModel: Manages user authentication state with Firebase
 	•	Repository: Handles data sources and interactions with Firebase
@@ -48,6 +51,7 @@ This structure isolates authentication logic while keeping map UI interactions r
 Authentication
 
 Firebase Authentication is used to manage user sign-in.
+
 	•	Supports email and phone-based authentication
 	•	Authentication logic is isolated in the ViewModel
 	•	Implemented for learning and demonstration purposes
@@ -58,6 +62,7 @@ Firebase Authentication is used to manage user sign-in.
 Filtering Logic
 
 Filtering is implemented directly in the MapFragment:
+
 	•	Time filters — show upcoming or events within a selected time range
 	•	Category filters — filter by event type
 
@@ -66,6 +71,7 @@ The map updates dynamically when filters are applied, giving users a responsive 
 ⸻
 
 Key Challenges & Learnings
+
 	•	Integrating and customizing Google Maps API
 	•	Managing map markers and click interactions
 	•	Implementing combined time and category filtering
@@ -75,6 +81,7 @@ Key Challenges & Learnings
 ⸻
 
 Known Limitations
+
 	•	Firebase Authentication is simplified for demonstration purposes
 	•	External services (SMS/email) may not work fully due to configuration or billing limits
 	•	The project is intended as a portfolio and learning project, not production-ready
@@ -82,7 +89,15 @@ Known Limitations
 ⸻
 
 Future Improvements
+
 	•	Improve authentication flow and error handling
 	•	Add marker clustering for large numbers of events
 	•	Enhance UI/UX and animations
 	•	Add unit tests for repository and user-related ViewModel
+
+
+
+https://github.com/user-attachments/assets/c8cd6d9b-0c3a-45a2-a6d8-6c65ec7ad769
+
+
+	
